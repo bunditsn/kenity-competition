@@ -178,9 +178,10 @@ body{font-family:'Prompt',-apple-system,Tahoma,sans-serif;background:#0d1b2e;col
 .match-live-team{flex:1}
 .match-live-name{font-size:.76rem;font-weight:700;line-height:1.3}
 .match-live-players{font-size:.62rem;color:#a0b4c8;margin-top:2px}
-.match-live-vs{font-size:.6rem;font-weight:900;color:rgba(201,168,92,.5);flex-shrink:0}
-.w-badge{display:inline-block;font-size:.56rem;background:#4ade80;color:#0d1b2e;font-weight:900;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle}
-.l-badge{display:inline-block;font-size:.56rem;background:#f87171;color:#fff;font-weight:900;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle}
+.match-live-vs{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.vs-word{font-size:.6rem;font-weight:900;color:rgba(201,168,92,.5)}
+.mob-win{font-size:.6rem;font-weight:900;color:#4ade80;background:rgba(74,222,128,.13);border:1px solid rgba(74,222,128,.38);border-radius:4px;padding:2px 5px;white-space:nowrap}
+.mob-lose{font-size:.6rem;font-weight:900;color:#f87171;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:4px;padding:2px 5px;white-space:nowrap}
 .match-live-card.done-w1{border-color:rgba(74,222,128,.25)}
 .track-section{margin-bottom:8px}
 .track-hdr{display:flex;align-items:center;gap:8px;padding:12px 14px 6px}
@@ -729,18 +730,20 @@ function renderLive() {
 }
 
 function matchCard(m, result, label) {
-  const w = result?.winner_id, l = result?.loser_id;
+  const w = result?.winner_id;
   const t1won = w===m.t1, t2won = w===m.t2;
+  const tag1 = w ? (t1won ? '<span class="mob-win">🥇 WIN!</span>' : '<span class="mob-lose">😢 LOSE!</span>') : '';
+  const tag2 = w ? (t2won ? '<span class="mob-win">🥇 WIN!</span>' : '<span class="mob-lose">😢 LOSE!</span>') : '';
   return `<div class="match-live-card${w?' done-w1':''}">
     <div class="match-live-top">${label}</div>
     <div class="match-live-row">
       <div class="match-live-team">
-        <div class="match-live-name">${tn(m.t1)}${t1won?'<span class="w-badge">W</span>':t2won?'<span class="l-badge">L</span>':''}</div>
+        <div class="match-live-name">${tn(m.t1)}</div>
         <div class="match-live-players">${tp(m.t1)}</div>
       </div>
-      <div class="match-live-vs">VS</div>
+      <div class="match-live-vs">${tag1}<span class="vs-word">VS</span>${tag2}</div>
       <div class="match-live-team" style="text-align:right">
-        <div class="match-live-name">${t2won?'<span class="w-badge">W</span>':t1won?'<span class="l-badge">L</span>':''}${tn(m.t2)}</div>
+        <div class="match-live-name">${tn(m.t2)}</div>
         <div class="match-live-players">${tp(m.t2)}</div>
       </div>
     </div>
