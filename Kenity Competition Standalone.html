@@ -233,6 +233,44 @@ body{font-family:'Prompt',-apple-system,Tahoma,sans-serif;background:#0d1b2e;col
 .cselect-row{display:flex;gap:6px;margin-bottom:8px;align-items:center}
 .admin-ok{color:#4ade80;font-size:.72rem;text-align:center;margin-top:4px}
 .admin-err{color:#f87171;font-size:.72rem;text-align:center;margin-top:4px}
+/* ── BRACKET ── */
+.bk-wrap{padding:0 12px 10px}
+.bk-tree{display:flex;flex-direction:column;gap:10px}
+.bk-court-block{background:#152a45;border-radius:14px;border:1px solid rgba(201,168,92,.13);overflow:hidden}
+.bk-court-hdr{background:linear-gradient(90deg,#1e3a5f,#152a45);padding:7px 12px;font-size:.66rem;font-weight:800;color:#c9a85c;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid rgba(201,168,92,.12)}
+.bk-court-body{padding:8px 10px;display:flex;flex-direction:column;gap:8px}
+.bk-path{display:flex;align-items:center;gap:0}
+.bk-path+.bk-path{border-top:1px solid rgba(255,255,255,.05);padding-top:8px}
+.bk-r1{display:flex;flex-direction:column;gap:4px;width:130px;flex-shrink:0}
+.bk-pair{display:flex;flex-direction:column;gap:2px;position:relative}
+.bk-pair::after{content:'';position:absolute;right:-10px;top:11px;height:calc(100% - 22px);width:1px;background:rgba(201,168,92,.35)}
+.bk-slot{background:#0d1b2e;border:1px solid rgba(201,168,92,.18);border-radius:6px;padding:4px 7px;font-size:.6rem;font-weight:600;line-height:1.3;color:#f0e8d5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.bk-slot.bk-w{border-color:rgba(74,222,128,.5);color:#4ade80}
+.bk-slot.bk-l{border-color:rgba(248,113,113,.2);color:rgba(248,113,113,.55)}
+.bk-slot.bk-nd{color:#a0b4c8;font-style:italic}
+.bk-line{width:20px;flex-shrink:0;display:flex;align-items:center;position:relative}
+.bk-line::before{content:'';position:absolute;left:0;top:50%;width:10px;height:1px;background:rgba(201,168,92,.35)}
+.bk-r2{display:flex;flex-direction:column;gap:4px;width:130px;flex-shrink:0;position:relative}
+.bk-r2::before{content:'';position:absolute;left:-10px;top:11px;height:calc(100% - 22px);width:1px;background:rgba(201,168,92,.35)}
+.bk-dest-col{display:flex;flex-direction:column;justify-content:space-around;gap:4px;padding-left:10px}
+.bk-chip{font-size:.6rem;font-weight:900;padding:3px 7px;border-radius:6px;white-space:nowrap;text-align:center}
+.bk-chip.ww{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.bk-chip.wl{background:rgba(163,230,53,.1);color:#a3e635;border:1px solid rgba(163,230,53,.25)}
+.bk-chip.lw{background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.25)}
+.bk-chip.ll{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.3)}
+.bk-chip.nd{background:rgba(160,180,200,.07);color:#a0b4c8;border:1px solid rgba(160,180,200,.15)}
+.bk-chip-sub{font-size:.48rem;font-weight:600;opacity:.75;margin-top:1px}
+.bk-track-block{background:#152a45;border-radius:14px;border:1px solid rgba(201,168,92,.13);margin:0 12px 10px;overflow:hidden}
+.bk-track-hdr{padding:7px 12px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid rgba(201,168,92,.12)}
+.bk-track-hdr.upper{background:linear-gradient(90deg,rgba(74,222,128,.12),#152a45);color:#4ade80}
+.bk-track-hdr.lower{background:linear-gradient(90deg,rgba(248,113,113,.12),#152a45);color:#f87171}
+.bk-rounds-row{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px;gap:0}
+.bk-round-col{display:flex;flex-direction:column;justify-content:space-around;flex-shrink:0}
+.bk-round-lbl{font-size:.48rem;color:#a0b4c8;text-transform:uppercase;letter-spacing:.1em;text-align:center;margin-bottom:6px}
+.bk-match-node{display:flex;flex-direction:column;gap:3px;margin:6px 0;position:relative;width:120px}
+.bk-match-node::after{content:'';position:absolute;right:-12px;top:50%;width:12px;height:1px;background:rgba(201,168,92,.35)}
+.bk-connector{width:24px;flex-shrink:0;position:relative;display:flex;align-items:center}
+.bk-connector::before{content:'';position:absolute;left:0;top:50%;width:100%;height:1px;background:rgba(201,168,92,.35)}
 </style>
 </head>
 <body>
@@ -677,6 +715,8 @@ function renderLive() {
     });
   }
 
+  html += renderBracket();
+  html += renderCustomBracket();
   html += `<div style="height:20px"></div>`;
   el.innerHTML = html;
 }
@@ -698,6 +738,97 @@ function matchCard(m, result, label) {
       </div>
     </div>
   </div>`;
+}
+
+function renderBracket() {
+  const slot = (id, result) => {
+    if (!id) return `<div class="bk-slot bk-nd">รอผล</div>`;
+    const w = result?.winner_id===id, done = !!(result?.winner_id);
+    return `<div class="bk-slot${done?(w?' bk-w':' bk-l'):''}">${tn(id)}</div>`;
+  };
+  const chip = (cls, lbl, sub) => `<div class="bk-chip ${cls}">${lbl}${sub?`<div class="bk-chip-sub">${sub}</div>`:''}</div>`;
+
+  let html = `<div class="live-sec-title">แผนผังทัวร์นาเมนต์</div><div class="bk-wrap"><div class="bk-tree">`;
+
+  for (let c = 1; c <= 7; c++) {
+    const m1 = R1.find(m=>m.id===`r1_c${c}_m1`);
+    const m2 = R1.find(m=>m.id===`r1_c${c}_m2`);
+    const r1a = res[m1.id], r1b = res[m2.id];
+    const r2w = res[`r2_c${c}_w`], r2l = res[`r2_c${c}_l`];
+    const wT1 = r1a?.winner_id, wT2 = r1b?.winner_id;
+    const lT1 = r1a?.loser_id,  lT2 = r1b?.loser_id;
+
+    html += `<div class="bk-court-block">
+      <div class="bk-court-hdr">🏸 สนาม ${c}</div>
+      <div class="bk-court-body">
+        <div class="bk-path">
+          <div class="bk-r1">
+            <div class="bk-pair">${slot(m1.t1,r1a)}${slot(m1.t2,r1a)}</div>
+            <div class="bk-pair">${slot(m2.t1,r1b)}${slot(m2.t2,r1b)}</div>
+          </div>
+          <div class="bk-line"></div>
+          <div class="bk-r2">${slot(wT1,r2w)}${slot(wT2,r2w)}</div>
+          <div class="bk-dest-col">
+            ${r2w?.winner_id?chip('ww','🔼 WW','สายบน'):chip('nd','—')}
+            ${r2w?.loser_id ?chip('wl','🔼 WL','สายบน'):chip('nd','—')}
+          </div>
+        </div>
+        <div class="bk-path">
+          <div class="bk-r1">
+            <div class="bk-pair">
+              ${slot(lT1,{winner_id:r1a?.loser_id})}
+              ${slot(lT2,{winner_id:r1b?.loser_id})}
+            </div>
+          </div>
+          <div class="bk-line"></div>
+          <div class="bk-r2">${slot(lT1,r2l)}${slot(lT2,r2l)}</div>
+          <div class="bk-dest-col">
+            ${r2l?.winner_id?chip('lw','🔽 LW','สายล่าง'):chip('nd','—')}
+            ${r2l?.loser_id ?chip('ll','🔽 LL','สายล่าง'):chip('nd','—')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  html += `</div></div>`;
+  return html;
+}
+
+function renderCustomBracket() {
+  if (!customM.length) return '';
+  const slot2 = (id, won) => {
+    if (!id) return `<div class="bk-slot bk-nd">TBD</div>`;
+    return `<div class="bk-slot${won===true?' bk-w':won===false?' bk-l':''}">${tn(id)}</div>`;
+  };
+  const rounds = [...new Set(customM.map(m=>m.round))].sort((a,b)=>a-b);
+
+  let html = `<div class="live-sec-title">แผนผังรอบ 3 ขึ้นไป</div>`;
+
+  ['upper','lower'].forEach(track => {
+    const trackMatches = customM.filter(m=>m.track===track);
+    if (!trackMatches.length) return;
+    const color = track==='upper' ? '🔼 สายบน' : '🔽 สายล่าง';
+    const cls = track==='upper' ? 'upper' : 'lower';
+    html += `<div class="bk-track-block"><div class="bk-track-hdr ${cls}">${color}</div><div class="bk-rounds-row">`;
+
+    rounds.forEach((rnd, ri) => {
+      const rMatches = trackMatches.filter(m=>m.round===rnd);
+      if (!rMatches.length) return;
+      if (ri > 0) html += `<div class="bk-connector"></div>`;
+      html += `<div class="bk-round-col"><div class="bk-round-lbl">รอบ ${rnd}</div>`;
+      rMatches.forEach(m => {
+        const w = m.winner_id;
+        html += `<div class="bk-match-node">
+          ${slot2(m.team1_id, w ? w===m.team1_id : undefined)}
+          ${slot2(m.team2_id, w ? w===m.team2_id : undefined)}
+        </div>`;
+      });
+      html += `</div>`;
+    });
+
+    html += `</div></div>`;
+  });
+  return html;
 }
 
 function onSearch(val) {
