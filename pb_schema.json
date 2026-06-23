@@ -1,0 +1,35 @@
+[
+  {
+    "name": "assignments",
+    "type": "base",
+    "schema": [
+      { "name": "team_id",  "type": "text", "required": true,  "options": {} },
+      { "name": "player1",  "type": "text", "required": false, "options": {} },
+      { "name": "player2",  "type": "text", "required": false, "options": {} }
+    ],
+    "listRule": "", "viewRule": "", "createRule": "", "updateRule": "", "deleteRule": ""
+  },
+  {
+    "name": "match_results",
+    "type": "base",
+    "schema": [
+      { "name": "match_id",   "type": "text",   "required": true,  "options": {} },
+      { "name": "round",      "type": "number", "required": false, "options": {} },
+      { "name": "winner_id",  "type": "text",   "required": false, "options": {} },
+      { "name": "loser_id",   "type": "text",   "required": false, "options": {} }
+    ],
+    "listRule": "", "viewRule": "", "createRule": "", "updateRule": "", "deleteRule": ""
+  },
+  {
+    "name": "custom_matches",
+    "type": "base",
+    "schema": [
+      { "name": "round",      "type": "number", "required": true,  "options": {} },
+      { "name": "track",      "type": "text",   "required": false, "options": {} },
+      { "name": "team1_id",   "type": "text",   "required": false, "options": {} },
+      { "name": "team2_id",   "type": "text",   "required": false, "options": {} },
+      { "name": "winner_id",  "type": "text",   "required": false, "options": {} }
+    ],
+    "listRule": "", "viewRule": "", "createRule": "", "updateRule": "", "deleteRule": ""
+  }
+]
