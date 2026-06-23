@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0d1b2e">
 <title>Kenity Club — กระชับมิตร 2569</title>
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.3/dist/pocketbase.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Prompt',-apple-system,Tahoma,sans-serif;background:#0d1b2e;color:#f0e8d5;overscroll-behavior:contain;-webkit-font-smoothing:antialiased}
@@ -472,7 +472,7 @@ const R1 = [
 ];
 
 // ═══════════════════════ STATE ═══════════════════════
-let pb = null, pbConn = false;
+let sb = null, pbConn = false;
 let asgn = {}, res = {}, customM = [];
 let adminOpen = false, adminPhase = 'setup';
 let logoTaps = 0, logoTimer = null;
@@ -538,12 +538,15 @@ function getPlayerInfo(name) {
   return null;
 }
 
-// ═══════════════════════ POCKETBASE ═══════════════════════
-async function connectPB(url) {
+// ═══════════════════════ SUPABASE ═══════════════════════
+const SB_URL = 'https://pivzrsorwxdknfzczenw.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpdnpyc29yd3hka25memN6ZW53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTkxNTAsImV4cCI6MjA5Nzc3NTE1MH0.IMOLpXTHEdd3J4n73Lx_01ChMGLVCp4uz96q5GvpAPE';
+
+async function connectPB() {
   try {
-    pb = new PocketBase(url.trim());
-    await pb.health.check();
-    localStorage.setItem('kenity_pb_url', url.trim());
+    sb = supabase.createClient(SB_URL, SB_KEY);
+    const { error } = await sb.from('assignments').select('count').limit(1);
+    if (error) throw error;
     pbConn = true;
     await loadAll();
     subscribe();
@@ -551,51 +554,56 @@ async function connectPB(url) {
     renderLive();
     return true;
   } catch(e) {
-    pb = null; pbConn = false;
+    sb = null; pbConn = false;
     return false;
   }
 }
 async function loadAll() {
   const [a, r, c] = await Promise.all([
-    pb.collection('assignments').getFullList({batch:200}),
-    pb.collection('match_results').getFullList({batch:500}),
-    pb.collection('custom_matches').getFullList({batch:200, sort:'+round,+created'})
+    sb.from('assignments').select('*'),
+    sb.from('match_results').select('*'),
+    sb.from('custom_matches').select('*').order('round').order('created_at')
   ]);
-  asgn = {}; a.forEach(x => asgn[x.team_id] = x);
-  res  = {}; r.forEach(x => res[x.match_id]  = x);
-  customM = c;
+  asgn = {}; (a.data||[]).forEach(x => asgn[x.team_id] = x);
+  res  = {}; (r.data||[]).forEach(x => res[x.match_id]  = x);
+  customM = c.data||[];
 }
 function subscribe() {
-  pb.collection('assignments').subscribe('*', e => {
-    if (e.action==='delete') delete asgn[e.record.team_id];
-    else asgn[e.record.team_id] = e.record;
-    renderLive(); if (adminOpen) renderAdminContent();
-  });
-  pb.collection('match_results').subscribe('*', e => {
-    if (e.action==='delete') delete res[e.record.match_id];
-    else res[e.record.match_id] = e.record;
-    renderLive(); if (adminOpen) renderAdminContent();
-  });
-  pb.collection('custom_matches').subscribe('*', async () => {
-    customM = await pb.collection('custom_matches').getFullList({batch:200,sort:'+round,+created'});
-    renderLive(); if (adminOpen) renderAdminContent();
-  });
+  sb.channel('kenity')
+    .on('postgres_changes', {event:'*',schema:'public',table:'assignments'}, e => {
+      const rec = e.new || e.old;
+      if (e.eventType==='DELETE') delete asgn[rec.team_id];
+      else asgn[rec.team_id] = rec;
+      renderLive(); if (adminOpen) renderAdminContent();
+    })
+    .on('postgres_changes', {event:'*',schema:'public',table:'match_results'}, e => {
+      const rec = e.new || e.old;
+      if (e.eventType==='DELETE') delete res[rec.match_id];
+      else res[rec.match_id] = rec;
+      renderLive(); if (adminOpen) renderAdminContent();
+    })
+    .on('postgres_changes', {event:'*',schema:'public',table:'custom_matches'}, async () => {
+      const {data} = await sb.from('custom_matches').select('*').order('round').order('created_at');
+      customM = data||[];
+      renderLive(); if (adminOpen) renderAdminContent();
+    })
+    .subscribe();
 }
 async function saveAssignment(teamId, p1, p2) {
   const existing = asgn[teamId];
-  if (existing) await pb.collection('assignments').update(existing.id, {player1:p1,player2:p2});
-  else await pb.collection('assignments').create({team_id:teamId,player1:p1,player2:p2});
+  if (existing) await sb.from('assignments').update({player1:p1,player2:p2}).eq('id',existing.id);
+  else await sb.from('assignments').insert({team_id:teamId,player1:p1,player2:p2});
 }
 async function saveResult(matchId, round, winnerId, loserId) {
   const existing = res[matchId];
-  if (existing) await pb.collection('match_results').update(existing.id, {winner_id:winnerId,loser_id:loserId});
-  else await pb.collection('match_results').create({match_id:matchId,round,winner_id:winnerId,loser_id:loserId});
+  if (existing) await sb.from('match_results').update({winner_id:winnerId,loser_id:loserId}).eq('id',existing.id);
+  else await sb.from('match_results').insert({match_id:matchId,round,winner_id:winnerId,loser_id:loserId});
 }
 async function createCustomMatch(round, track, t1, t2) {
-  await pb.collection('custom_matches').create({round,track,team1_id:t1,team2_id:t2,winner_id:''});
+  await sb.from('custom_matches').insert({round,track,team1_id:t1,team2_id:t2,winner_id:''});
 }
 async function setCustomResult(recordId, winnerId, loserId) {
-  await pb.collection('custom_matches').update(recordId, {winner_id:winnerId});
+  await sb.from('custom_matches').update({winner_id:winnerId}).eq('id',recordId);
 }
 
 // ═══════════════════════ NAV ═══════════════════════
@@ -711,15 +719,13 @@ function closeAdmin() { adminOpen=false; document.getElementById('adminOverlay')
 
 function renderAdminContent() {
   const el = document.getElementById('adminBody');
-  const url = localStorage.getItem('kenity_pb_url')||'';
-  let h = `<div class="admin-pb-row"><div class="admin-pb-dot${pbConn?' on':''}"></div><div class="admin-pb-status">${pbConn?'เชื่อมต่อแล้ว: '+url:'ยังไม่ได้เชื่อมต่อ'}</div></div>`;
+  let h = `<div class="admin-pb-row"><div class="admin-pb-dot${pbConn?' on':''}"></div><div class="admin-pb-status">${pbConn?'เชื่อมต่อ Supabase แล้ว ✅':'ยังไม่ได้เชื่อมต่อ'}</div></div>`;
   if (!pbConn) {
-    h += `<div class="admin-notice">กรอก URL ของ PocketBase บน NAS ของคุณ<br>เช่น https://kenity.yournas.synology.me</div>
-    <input class="admin-input" id="pbUrlIn" placeholder="https://..." value="${url}">
+    h += `<div class="admin-notice">เชื่อมต่อ Supabase เพื่อเริ่มจัดการทัวร์นาเมนต์</div>
     <button class="abtn" onclick="adminConnect()">เชื่อมต่อ</button>
     <div id="adminConnMsg"></div>`;
   } else {
-    h += `<button class="abtn-sm" onclick="pbConn=false;pb=null;setLiveIndicator(false);renderAdminContent()" style="margin-bottom:12px">ตัดการเชื่อมต่อ</button>`;
+    h += `<button class="abtn-sm" onclick="pbConn=false;sb=null;setLiveIndicator(false);renderAdminContent()" style="margin-bottom:12px">ตัดการเชื่อมต่อ</button>`;
     h += `<div class="admin-phase-row">
       <button class="admin-phase-btn${adminPhase==='setup'?' active':''}" onclick="setPhase('setup')">⚙️ Setup</button>
       <button class="admin-phase-btn${adminPhase==='r1'?' active':''}" onclick="setPhase('r1')">รอบ 1</button>
@@ -835,12 +841,11 @@ function renderAdminR3() {
 
 // ═══════════════════════ ADMIN ACTIONS ═══════════════════════
 async function adminConnect() {
-  const url = document.getElementById('pbUrlIn').value;
   const msg = document.getElementById('adminConnMsg');
   msg.innerHTML = '<span style="color:#c9a85c;font-size:.76rem">กำลังเชื่อมต่อ...</span>';
-  const ok = await connectPB(url);
+  const ok = await connectPB();
   if (ok) { renderAdminContent(); }
-  else { msg.innerHTML = '<span class="admin-err">เชื่อมต่อไม่สำเร็จ — ตรวจสอบ URL และ CORS ใน PocketBase</span>'; }
+  else { msg.innerHTML = '<span class="admin-err">เชื่อมต่อไม่สำเร็จ — ตรวจสอบ Supabase</span>'; }
 }
 function setPhase(p) { adminPhase=p; renderAdminContent(); }
 async function doAssign(teamId, p1, p2) {
@@ -924,8 +929,8 @@ document.getElementById('adminOverlay').addEventListener('click', e=>{
 
 // Auto-connect on load
 (async()=>{
-  const saved = localStorage.getItem('kenity_pb_url');
-  if (saved) { await connectPB(saved); if(curTab===5) renderLive(); }
+  await connectPB();
+  if(curTab===5) renderLive();
 })();
 </script>
 </body>
