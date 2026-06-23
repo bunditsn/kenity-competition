@@ -167,7 +167,11 @@ body{font-family:'Prompt',-apple-system,Tahoma,sans-serif;background:#0d1b2e;col
 .player-card-partner{font-size:.82rem;color:#f0e8d5;margin-bottom:4px}
 .player-card-status{font-size:.76rem;color:#a0b4c8;line-height:1.6}
 .player-card-next{font-size:.78rem;color:#4ade80;margin-top:8px;font-weight:700}
-.live-sec-title{font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:#c9a85c;padding:16px 14px 8px}
+.live-sec-title{font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:#c9a85c;padding:16px 14px 8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent}
+.live-sec-title:active{opacity:.7}
+.sec-chev{font-size:.7rem;letter-spacing:0;transition:transform .2s;display:inline-block;flex-shrink:0}
+.live-sec-title.sec-closed .sec-chev{transform:rotate(-90deg)}
+.live-sec-body.sec-hidden{display:none}
 .match-live-card{background:#152a45;border-radius:14px;border:1px solid rgba(201,168,92,.11);padding:12px 14px;margin:0 12px 8px}
 .match-live-top{font-size:.56rem;color:#a0b4c8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
 .match-live-row{display:flex;align-items:center;gap:8px}
@@ -672,22 +676,24 @@ function renderLive() {
   html += `<div class="live-search"><input type="text" id="searchInput" placeholder="🔍 พิมพ์ชื่อของคุณ..." oninput="onSearch(this.value)"></div><div id="searchResult"></div>`;
 
   // R1 results
-  html += `<div class="live-sec-title">รอบที่ 1 — ผลการแข่งขัน</div>`;
+  html += `<div class="live-sec-title sec-closed" onclick="toggleSec(this)">รอบที่ 1 — ผลการแข่งขัน <span class="sec-chev">▾</span></div><div class="live-sec-body sec-hidden">`;
   for (let c=1;c<=7;c++) {
     const m1=R1.find(m=>m.id===`r1_c${c}_m1`), m2=R1.find(m=>m.id===`r1_c${c}_m2`);
     const r1=res[m1.id], r2m=res[m2.id];
     html += matchCard(m1,r1,'สนาม '+c+' คู่ที่ 1') + matchCard(m2,r2m,'สนาม '+c+' คู่ที่ 2');
   }
+  html += `</div>`;
 
   // R2 results (if any)
   if (r2.length) {
-    html += `<div class="live-sec-title">รอบที่ 2 — ผลการแข่งขัน</div>`;
+    html += `<div class="live-sec-title sec-closed" onclick="toggleSec(this)">รอบที่ 2 — ผลการแข่งขัน <span class="sec-chev">▾</span></div><div class="live-sec-body sec-hidden">`;
     r2.forEach(m => html += matchCard(m, res[m.id], `สนาม ${m.court} · ${m.label}`));
+    html += `</div>`;
   }
 
   // Tracks
   if (tracks.upper.length || tracks.lower.length) {
-    html += `<div class="live-sec-title">แบ่งสาย</div>`;
+    html += `<div class="live-sec-title sec-closed" onclick="toggleSec(this)">แบ่งสาย <span class="sec-chev">▾</span></div><div class="live-sec-body sec-hidden">`;
     if (tracks.upper.length) {
       html += `<div class="track-section"><div class="track-hdr"><span class="track-hdr-icon">🔼</span><span class="track-hdr-title upper-color">สายบน (${tracks.upper.length} ทีม)</span></div><div class="track-grid">`;
       tracks.upper.forEach(t => {
@@ -702,20 +708,21 @@ function renderLive() {
       });
       html += `</div></div>`;
     }
+    html += `</div>`;
   }
 
   // Custom matches (R3+)
   if (customM.length) {
     const rounds = [...new Set(customM.map(m=>m.round))].sort((a,b)=>a-b);
     rounds.forEach(round => {
-      html += `<div class="live-sec-title">รอบที่ ${round}</div>`;
+      html += `<div class="live-sec-title sec-closed" onclick="toggleSec(this)">รอบที่ ${round} <span class="sec-chev">▾</span></div><div class="live-sec-body sec-hidden">`;
       customM.filter(m=>m.round===round).forEach(m => {
         html += matchCard({id:m.id,t1:m.team1_id,t2:m.team2_id}, m.winner_id?{winner_id:m.winner_id,loser_id:m.team1_id===m.winner_id?m.team2_id:m.team1_id}:null, m.track==='upper'?'🔼 สายบน':'🔽 สายล่าง');
       });
+      html += `</div>`;
     });
   }
 
-  html += renderBracket();
   html += renderCustomBracket();
   html += `<div style="height:20px"></div>`;
   el.innerHTML = html;
@@ -802,7 +809,7 @@ function renderCustomBracket() {
   };
   const rounds = [...new Set(customM.map(m=>m.round))].sort((a,b)=>a-b);
 
-  let html = `<div class="live-sec-title">แผนผังรอบ 3 ขึ้นไป</div>`;
+  let html = `<div class="live-sec-title sec-closed" onclick="toggleSec(this)">แผนผังรอบ 3 ขึ้นไป <span class="sec-chev">▾</span></div><div class="live-sec-body sec-hidden">`;
 
   ['upper','lower'].forEach(track => {
     const trackMatches = customM.filter(m=>m.track===track);
@@ -828,7 +835,15 @@ function renderCustomBracket() {
 
     html += `</div></div>`;
   });
+  html += `</div>`;
   return html;
+}
+
+function toggleSec(el) {
+  const body = el.nextElementSibling;
+  const closing = !el.classList.contains('sec-closed');
+  el.classList.toggle('sec-closed', closing);
+  body.classList.toggle('sec-hidden', closing);
 }
 
 function onSearch(val) {
