@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0d1b2e">
+<title>Kenity Club — กระชับมิตร 2569</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Prompt', -apple-system, Tahoma, sans-serif; background: #0d1b2e; color: #f0e8d5; overscroll-behavior: contain; -webkit-font-smoothing: antialiased; }
+
+  @keyframes splashOut {
+    0%, 62% { opacity: 1; visibility: visible; }
+    95% { opacity: 0; visibility: visible; }
+    100% { opacity: 0; visibility: hidden; }
+  }
+  @keyframes kennyPop {
+    0% { transform: scale(0.4) translateY(40px); opacity: 0; }
+    65% { transform: scale(1.08) translateY(-6px); opacity: 1; }
+    80% { transform: scale(0.97) translateY(2px); }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -300% center; }
+    100% { background-position: 300% center; }
+  }
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 0 7px rgba(201,168,92,0.1), 0 0 40px rgba(201,168,92,0.35); }
+    50% { box-shadow: 0 0 0 12px rgba(201,168,92,0.07), 0 0 72px rgba(201,168,92,0.6); }
+  }
+  @keyframes drift {
+    from { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    8% { opacity: 0.14; }
+    88% { opacity: 0.14; }
+    to { transform: translateY(-80px) rotate(720deg); opacity: 0; }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  @keyframes pillGlow {
+    0%, 100% { box-shadow: 0 4px 18px rgba(201,168,92,0.38); }
+    50% { box-shadow: 0 4px 32px rgba(201,168,92,0.72); }
+  }
+  @keyframes bonusBounce {
+    0%, 100% { transform: scale(1) rotate(-2deg); }
+    30% { transform: scale(1.18) rotate(3deg); }
+    60% { transform: scale(1.05) rotate(-1deg); }
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scrollBounce {
+    0%, 100% { transform: translateY(0); opacity: 0.55; }
+    50% { transform: translateY(9px); opacity: 1; }
+  }
+
+  /* SPLASH */
+  .splash {
+    position: fixed; inset: 0; z-index: 999;
+    background: radial-gradient(ellipse at 50% 38%, #1e3a5f 0%, #0d1b2e 68%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    animation: splashOut 3.4s ease-in-out forwards;
+    pointer-events: none;
+  }
+  .sp-img {
+    width: 190px; height: 190px; border-radius: 50%; object-fit: cover;
+    border: 4px solid #c9a85c;
+    animation: kennyPop 0.9s cubic-bezier(0.34, 1.4, 0.64, 1) both, glow 2.6s 1s ease-in-out infinite;
+    margin-bottom: 22px;
+  }
+  .sp-name {
+    font-size: 2.7rem; font-weight: 900; letter-spacing: 0.06em;
+    background: linear-gradient(90deg, #c9a85c 0%, #f0d090 45%, #c9a85c 100%);
+    background-size: 300% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeUp 0.6s 0.7s ease both, shimmer 2.8s 0.7s linear infinite;
+  }
+  .sp-sub {
+    font-size: 0.78rem; color: #a0b4c8; letter-spacing: 0.28em;
+    text-transform: uppercase; margin-top: 5px;
+    animation: fadeUp 0.6s 1s ease both;
+  }
+  .sp-pill {
+    margin-top: 22px; background: rgba(201,168,92,0.13);
+    border: 1px solid rgba(201,168,92,0.35);
+    color: #c9a85c; font-size: 0.84rem; font-weight: 700;
+    padding: 9px 22px; border-radius: 999px;
+    animation: fadeUp 0.6s 1.2s ease both;
+  }
+
+  /* PARTICLES */
+  .pts { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+
+  /* APP SHELL */
+  .app { max-width: 430px; margin: 0 auto; min-height: 100vh; position: relative; z-index: 1; }
+
+  /* HEADER */
+  .hdr {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(13,27,46,0.94); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(201,168,92,0.18);
+    padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .hdr-img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #c9a85c; flex-shrink: 0; }
+  .hdr-txt { flex: 1; }
+  .hdr-club { font-size: 0.8rem; font-weight: 700; color: #c9a85c; line-height: 1.1; }
+  .hdr-ev { font-size: 0.64rem; color: #a0b4c8; }
+  .hdr-pill {
+    background: linear-gradient(135deg, #c9a85c, #e8c97a);
+    color: #0d1b2e; font-size: 0.66rem; font-weight: 800;
+    padding: 5px 12px; border-radius: 999px;
+    white-space: nowrap; flex-shrink: 0;
+    animation: pillGlow 2.5s ease-in-out infinite;
+  }
+
+  /* CONTENT */
+  .main { padding-bottom: 72px; }
+
+  /* TAB PANELS */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* NAV */
+  .nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px; z-index: 50;
+    background: rgba(11,22,40,0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(201,168,92,0.15);
+    display: flex; padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 10px 4px 12px; background: none; border: none; cursor: pointer;
+    gap: 3px; font-family: 'Prompt', sans-serif;
+    -webkit-tap-highlight-color: transparent; transition: opacity 0.15s;
+    color: rgba(160,180,200,0.5);
+  }
+  .nav-btn.active { color: #c9a85c; }
+  .nav-btn:active { opacity: 0.6 !important; transform: scale(0.9); }
+  .nav-ic { font-size: 1.35rem; line-height: 1; }
+  .nav-lbl { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.02em; }
+
+  /* HERO */
+  .ap-hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 80px 28px 100px; position: relative;
+    background: radial-gradient(ellipse at 50% 30%, rgba(30,58,95,0.55) 0%, transparent 70%);
+  }
+  .ap-eyebrow { font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: #c9a85c; margin-bottom: 26px; opacity: 0.85; }
+  .ap-hero-img {
+    width: 145px; height: 145px; border-radius: 50%; object-fit: cover;
+    border: 3px solid rgba(201,168,92,0.5); margin-bottom: 30px;
+    animation: glow 3s ease-in-out infinite;
+  }
+  .ap-mega { font-size: 3.4rem; font-weight: 900; color: #f0e8d5; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 10px; text-wrap: balance; }
+  .ap-hero-sub { font-size: 1.1rem; color: #c9a85c; font-weight: 600; margin-bottom: 6px; }
+  .ap-hero-date { font-size: 0.8rem; color: #a0b4c8; }
+  .ap-scroll-hint {
+    position: absolute; bottom: 32px; left: 0; right: 0;
+    text-align: center; color: #a0b4c8; font-size: 0.58rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    animation: scrollBounce 2.2s ease-in-out infinite;
+  }
+  .ap-scroll-arrow { font-size: 1.05rem; margin-top: 5px; }
+
+  .ap-sep { height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,92,0.13), transparent); margin: 0 28px; }
+
+  .ap-section {
+    min-height: 82vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; padding: 64px 28px;
+  }
+  .ap-dark { background: rgba(0,0,0,0.26); }
+  .ap-label { font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase; color: #c9a85c; margin-bottom: 20px; }
+  .ap-bignum { font-size: 8.5rem; font-weight: 900; line-height: 0.88; color: #f0e8d5; letter-spacing: -0.05em; margin-bottom: 14px; }
+  .ap-bignum-gold { color: #c9a85c; }
+  .ap-bignumsub { font-size: 1.5rem; font-weight: 700; color: #c9a85c; margin-bottom: 18px; letter-spacing: -0.01em; }
+  .ap-desc { font-size: 0.86rem; color: #a0b4c8; line-height: 1.82; max-width: 295px; }
+
+  /* COUNTDOWN */
+  .ap-cd-row { display: flex; align-items: flex-start; justify-content: center; gap: 4px; margin: 6px 0 22px; }
+  .ap-cd-unit { display: flex; flex-direction: column; align-items: center; min-width: 60px; }
+  .ap-cd-num { font-size: 3rem; font-weight: 900; color: #c9a85c; line-height: 1; font-variant-numeric: tabular-nums; }
+  .ap-cd-lbl { font-size: 0.54rem; color: #a0b4c8; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 6px; }
+  .ap-cd-sep { font-size: 2.1rem; font-weight: 900; color: rgba(201,168,92,0.36); padding-top: 4px; }
+  .ap-cd-sub { font-size: 0.8rem; color: #a0b4c8; }
+
+  /* TILES */
+  .ap-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 340px; margin-top: 14px; }
+  .ap-tile { background: rgba(21,42,69,0.9); border: 1px solid rgba(201,168,92,0.14); border-radius: 18px; padding: 16px 14px; text-align: left; }
+  .ap-tile-ic { font-size: 1.8rem; margin-bottom: 9px; }
+  .ap-tile-ttl { font-size: 0.8rem; font-weight: 700; color: #f0e8d5; margin-bottom: 4px; line-height: 1.2; }
+  .ap-tile-desc { font-size: 0.7rem; color: #a0b4c8; line-height: 1.55; }
+
+  /* ATTIRE */
+  .ap-attire-ic { font-size: 4.5rem; margin-bottom: 10px; }
+  .ap-attire-txt { font-size: 2.3rem; font-weight: 900; color: #f0e8d5; letter-spacing: -0.02em; margin-bottom: 18px; }
+
+  /* SCROLL REVEAL */
+  .reveal { opacity: 0; transform: translateY(52px); transition: opacity 0.95s cubic-bezier(0.16,1,0.3,1), transform 0.95s cubic-bezier(0.16,1,0.3,1); will-change: opacity, transform; }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  /* SECTION + CARD */
+  .sec { padding: 10px 12px 0; }
+  .card { background: #152a45; border-radius: 20px; overflow: hidden; border: 1px solid rgba(201,168,92,0.11); margin-bottom: 12px; }
+  .card-hd { background: linear-gradient(90deg, #1e3a5f, #152a45); padding: 11px 16px; border-bottom: 2px solid #c9a85c; display: flex; align-items: center; gap: 8px; }
+  .card-hd h2 { font-size: 0.78rem; font-weight: 800; color: #c9a85c; text-transform: uppercase; letter-spacing: 0.13em; }
+  .card-bd { padding: 14px; }
+
+  /* TIMELINE */
+  .tli { display: flex; gap: 10px; margin-bottom: 10px; position: relative; }
+  .tli:not(:last-child)::after { content: ''; position: absolute; left: 17px; top: 37px; bottom: -8px; width: 2px; background: linear-gradient(#c9a85c 0%, transparent 100%); }
+  .tld { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #c9a85c, #e8c97a); color: #0d1b2e; font-weight: 900; font-size: 0.74rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px rgba(201,168,92,0.4); z-index: 1; }
+  .tlb { flex: 1; background: #1e3a5f; border-radius: 14px; padding: 10px 12px; border: 1px solid rgba(201,168,92,0.1); }
+  .tlb h3 { font-size: 0.87rem; font-weight: 700; color: #c9a85c; margin-bottom: 4px; }
+  .tlb p { font-size: 0.79rem; color: #a0b4c8; line-height: 1.65; }
+  .tlb p strong { color: #f0e8d5; }
+  .c-g { color: #4ade80; } .c-r { color: #f87171; } .c-p { color: #f472b6; }
+
+  /* BRACKET */
+  .bracket { background: #1e3a5f; border-radius: 16px; padding: 14px; border: 1px solid rgba(201,168,92,0.2); margin-bottom: 12px; }
+  .btt { font-size: 0.66rem; color: #c9a85c; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; text-align: center; margin-bottom: 10px; }
+  .bgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .bcol { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 8px; }
+  .bct { font-size: 0.66rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; text-align: center; margin-bottom: 6px; }
+  .bcu .bct { color: #4ade80; } .bcl .bct { color: #f87171; }
+  .br { font-size: 0.7rem; color: #a0b4c8; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .br:last-child { border: none; }
+
+  /* RULES */
+  .rule { background: #1e3a5f; border-radius: 16px; padding: 14px 16px 14px 18px; margin-bottom: 10px; border: 1px solid rgba(244,114,182,0.22); position: relative; overflow: hidden; }
+  .rule::before { content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px; background: #f472b6; }
+  .rule:last-child { margin-bottom: 0; }
+  .rule-ic { font-size: 1.9rem; margin-bottom: 5px; }
+  .rule h3 { font-size: 0.9rem; font-weight: 800; color: #f472b6; margin-bottom: 5px; }
+  .rule p { font-size: 0.8rem; color: #a0b4c8; line-height: 1.65; }
+  .rule p strong { color: #f0e8d5; }
+  .score-demo { display: flex; align-items: center; justify-content: center; gap: 14px; background: #0d1b2e; border-radius: 14px; padding: 14px; margin: 12px 0; }
+  .sd-box { text-align: center; }
+  .sd-lbl { font-size: 0.64rem; color: #a0b4c8; margin-bottom: 5px; }
+  .sd-num { font-size: 2.8rem; font-weight: 900; line-height: 1; }
+  .sd-from { color: #f472b6; animation: pulse 1.6s ease-in-out infinite; }
+  .sd-to { color: #4ade80; animation: pulse 1.6s 0.8s ease-in-out infinite; }
+  .sd-arr { font-size: 1.6rem; color: #c9a85c; font-weight: 900; }
+  .sd-star { font-size: 2rem; animation: bonusBounce 1.4s ease-in-out infinite; }
+
+  /* COURTS */
+  .court-note { font-size: 0.75rem; color: #a0b4c8; background: rgba(201,168,92,0.07); border-radius: 10px; padding: 9px 12px; margin-bottom: 10px; border-left: 2px solid #c9a85c; line-height: 1.6; }
+  .cblock { background: #1e3a5f; border-radius: 14px; overflow: hidden; margin-bottom: 8px; border: 1px solid rgba(201,168,92,0.13); }
+  .cblock:last-child { margin-bottom: 0; }
+  .chd { background: linear-gradient(90deg, #c9a85c, #e8c97a); color: #0d1b2e; padding: 6px 12px; font-weight: 900; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .match { display: flex; align-items: center; gap: 6px; padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .match:last-child { border: none; }
+  .ta { flex: 1; font-size: 0.76rem; font-weight: 600; line-height: 1.3; }
+  .tb { flex: 1; font-size: 0.76rem; font-weight: 600; text-align: right; line-height: 1.3; }
+  .vs-b { flex-shrink: 0; background: rgba(201,168,92,0.16); color: #c9a85c; font-size: 0.58rem; font-weight: 900; padding: 2px 7px; border-radius: 4px; }
+
+  /* MEMBERS */
+  .mtog { width: 100%; background: #1e3a5f; color: #a0b4c8; border: 1px solid rgba(201,168,92,0.2); border-radius: 12px; padding: 11px 14px; font-size: 0.82rem; font-family: 'Prompt', sans-serif; cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; -webkit-tap-highlight-color: transparent; }
+  .mgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+  .mchip { background: #1e3a5f; border-radius: 8px; padding: 6px 8px; font-size: 0.75rem; color: #f0e8d5; display: flex; align-items: center; gap: 5px; }
+  .mnum { color: #c9a85c; font-weight: 700; font-size: 0.67rem; min-width: 18px; flex-shrink: 0; }
+  .msub { font-size: 0.68rem; font-weight: 800; color: #c9a85c; text-transform: uppercase; letter-spacing: 0.1em; margin: 8px 0 6px; }
+  .member-open { animation: slideDown 0.25s ease; }
+  .members-section { display: none; }
+  .members-section.open { display: block; }
+
+  /* FOOTER */
+  .footer { text-align: center; padding: 20px 16px 10px; }
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div class="pts" id="pts"></div>
+
+<!-- SPLASH -->
+<div class="splash">
+  <img src="uploads/IMG_8030.JPG" alt="Kenny" class="sp-img">
+  <div class="sp-name">KENITY CLUB</div>
+  <div class="sp-sub">Time is Running</div>
+  <div class="sp-pill">📅 พุธที่ 24 มิ.ย. 2569 &nbsp;·&nbsp; 09:00–12:00 น.</div>
+</div>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <img src="uploads/IMG_8030.JPG" alt="Kenny" class="hdr-img">
+    <div class="hdr-txt">
+      <div class="hdr-club">🏸 KENITY CLUB</div>
+      <div class="hdr-ev">กระชับมิตรภายในก๊วน 2569</div>
+    </div>
+    <div class="hdr-pill">24 มิ.ย. 69</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="main">
+
+    <!-- ══ TAB 0: HOME ══ -->
+    <div class="tab-panel active" id="tab0">
+
+      <!-- ① HERO -->
+      <div class="ap-hero">
+        <div class="ap-eyebrow">🏸 Kenity Club · กระชับมิตร 2569</div>
+        <img src="uploads/IMG_8030.JPG" alt="Kenny" class="ap-hero-img">
+        <div class="ap-mega">กระชับมิตร<br>ภายในก๊วน</div>
+        <div class="ap-hero-sub">Kenity Club</div>
+        <div class="ap-hero-date">พุธที่ 24 มิถุนายน 2569 · 09:00–12:00 น.</div>
+        <div class="ap-scroll-hint">เลื่อนลงเพื่อดู<div class="ap-scroll-arrow">↓</div></div>
+      </div>
+
+      <div class="ap-sep"></div>
+
+      <!-- ② COUNTDOWN -->
+      <div class="ap-section ap-dark reveal">
+        <div class="ap-label">นับถอยหลัง</div>
+        <div class="ap-cd-row">
+          <div class="ap-cd-unit">
+            <div class="ap-cd-num" id="cd_d">--</div>
+            <div class="ap-cd-lbl">วัน</div>
+          </div>
+          <div class="ap-cd-sep">:</div>
+          <div class="ap-cd-unit">
+            <div class="ap-cd-num" id="cd_h">--</div>
+            <div class="ap-cd-lbl">ชั่วโมง</div>
+          </div>
+          <div class="ap-cd-sep">:</div>
+          <div class="ap-cd-unit">
+            <div class="ap-cd-num" id="cd_m">--</div>
+            <div class="ap-cd-lbl">นาที</div>
+          </div>
+          <div class="ap-cd-sep">:</div>
+          <div class="ap-cd-unit">
+            <div class="ap-cd-num" id="cd_s">--</div>
+            <div class="ap-cd-lbl">วินาที</div>
+          </div>
+        </div>
+        <div class="ap-cd-sub">สนามพรหมลิขิต · 09:00–12:00 น.</div>
+      </div>
+
+      <div class="ap-sep"></div>
+
+      <!-- ③ 28 TEAMS -->
+      <div class="ap-section reveal">
+        <div class="ap-label">ผู้เข้าร่วมทั้งหมด</div>
+        <div class="ap-bignum">28</div>
+        <div class="ap-bignumsub">ทีม · 56 ชีวิต</div>
+        <div class="ap-desc">จับฉลากหาคู่แข่งขัน อยู่เป็นคู่กันตั้งแต่ต้นจนจบ ไม่มีการเปลี่ยนคู่</div>
+      </div>
+
+      <div class="ap-sep"></div>
+
+      <!-- ④ 5 ROUNDS -->
+      <div class="ap-section ap-dark reveal">
+        <div class="ap-label">รูปแบบการแข่งขัน</div>
+        <div class="ap-bignum ap-bignum-gold">5</div>
+        <div class="ap-bignumsub">รอบ สู่แชมป์</div>
+        <div class="ap-desc">ระบบ Double-Track สายบน–สายล่าง ทุกคนได้แข่งครบทุกรอบ ไม่มีตกรอบแรก</div>
+      </div>
+
+      <div class="ap-sep"></div>
+
+      <!-- ⑤ FEATURE TILES -->
+      <div class="ap-section reveal">
+        <div class="ap-label">สิ่งที่ต้องรู้</div>
+        <div class="ap-tiles">
+          <div class="ap-tile">
+            <div class="ap-tile-ic">🎰</div>
+            <div class="ap-tile-ttl">จับฉลากหาคู่</div>
+            <div class="ap-tile-desc">สุ่มคู่แข่งขัน อยู่ด้วยกันตลอดงาน</div>
+          </div>
+          <div class="ap-tile">
+            <div class="ap-tile-ic">🏆</div>
+            <div class="ap-tile-ttl">ของรางวัล</div>
+            <div class="ap-tile-desc">คู่ชนะ · คู่แพ้ · คู่พิเศษ 🫰</div>
+          </div>
+          <div class="ap-tile">
+            <div class="ap-tile-ic">📸</div>
+            <div class="ap-tile-ttl">ช่างภาพ</div>
+            <div class="ap-tile-desc">มีตากล้อง ปรุงหน้ามาด้วยนะ 💄</div>
+          </div>
+          <div class="ap-tile">
+            <div class="ap-tile-ic">🖤</div>
+            <div class="ap-tile-ttl">ยืนไว้อาลัย</div>
+            <div class="ap-tile-desc">1 นาที ก่อนเริ่มการแข่งขัน</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ap-sep"></div>
+
+      <!-- ⑥ ATTIRE -->
+      <div class="ap-section ap-dark reveal">
+        <div class="ap-label">ชุดแข่งขัน</div>
+        <div class="ap-attire-ic">👕</div>
+        <div class="ap-attire-txt">เสื้อสีดำ</div>
+        <div class="ap-desc">สนามพรหมลิขิต<br>พุธที่ 24 มิถุนายน 2569<br>09:00–12:00 น.</div>
+      </div>
+
+    </div>
+
+    <!-- ══ TAB 1: FORMAT ══ -->
+    <div class="tab-panel" id="tab1">
+      <div class="sec" style="padding-top:12px;">
+        <div class="card">
+          <div class="card-hd"><span>📊</span><h2>รูปแบบการแข่งขัน</h2></div>
+          <div class="card-bd">
+
+            <div class="tli">
+              <div class="tld">1</div>
+              <div class="tlb">
+                <h3>รอบที่ 1 — เปิดฉาก (28 ทีม)</h3>
+                <p>7 สนาม · สนามละ 2 คู่ = 14 คู่<br>
+                <strong>2 เซ็ต</strong> · ถ้าเสมอ 1-1 → <span class="c-p"><strong>ตัดสิน 1 แต้มเดียว! 😆</strong></span></p>
+              </div>
+            </div>
+            <div class="tli">
+              <div class="tld">2</div>
+              <div class="tlb">
+                <h3>รอบที่ 2 — แยกสาย (สนามเดิม)</h3>
+                <p><span class="c-g">✅ ชนะ</span> เจอ <span class="c-g">ชนะ</span> &nbsp;·&nbsp; <span class="c-r">❌ แพ้</span> เจอ <span class="c-r">แพ้</span><br>
+                <strong>1 เซ็ต</strong> · นั่งรอที่สนามเดิมได้เลย</p>
+              </div>
+            </div>
+            <div class="tli">
+              <div class="tld" style="font-size:1rem;">📋</div>
+              <div class="tlb">
+                <h3>หลังรอบ 2 — ลงชื่อสายที่จุด MC</h3>
+                <p><span class="c-g">🔼 สายบน</span> = ชนะเซตแรก<br>
+                <span class="c-r">🔽 สายล่าง</span> = แพ้เซตแรก</p>
+              </div>
+            </div>
+            <div class="bracket">
+              <div class="btt">แบ่งสายจากผล รอบ 1 + รอบ 2</div>
+              <div class="bgrid">
+                <div class="bcol bcu">
+                  <div class="bct">🔼 สายบน</div>
+                  <div class="br"><span class="c-g">W</span>–<span class="c-g">W</span> &nbsp; 7 ทีม</div>
+                  <div class="br"><span class="c-g">W</span>–<span class="c-r">L</span> &nbsp; 7 ทีม</div>
+                </div>
+                <div class="bcol bcl">
+                  <div class="bct">🔽 สายล่าง</div>
+                  <div class="br"><span class="c-r">L</span>–<span class="c-g">W</span> &nbsp; 7 ทีม</div>
+                  <div class="br"><span class="c-r">L</span>–<span class="c-r">L</span> &nbsp; 7 ทีม</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tli">
+              <div class="tld">3</div>
+              <div class="tlb">
+                <h3>รอบที่ 3 — จับฉลากใหม่ตามสาย</h3>
+                <p>แข่งภายในสายตัวเอง (บน / ล่าง) · <strong>1 เซ็ต</strong></p>
+              </div>
+            </div>
+            <div class="tli">
+              <div class="tld">4</div>
+              <div class="tlb">
+                <h3>รอบที่ 4 — ชิงอันดับสาย</h3>
+                <p>จบรอบ 4 → ได้ <strong>ที่ 3 และที่ 4</strong> ของแต่ละสาย · <strong>1 เซ็ต</strong></p>
+              </div>
+            </div>
+            <div class="tli">
+              <div class="tld" style="font-size:1rem;">🏅</div>
+              <div class="tlb">
+                <h3>รอบที่ 5 — ชิงชนะเลิศ! 🎉</h3>
+                <p><strong>ลงชื่อที่ Whiteboard ก่อนแข่ง!</strong><br>
+                <span class="c-g">🔼 สายบน</span> 2 ทีม → ชิง <strong>ที่ 1 &amp; 2</strong><br>
+                <span class="c-r">🔽 สายล่าง</span> 2 ทีม → ชิง <strong>ที่ 1 &amp; 2</strong></p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TAB 2: RULES ══ -->
+    <div class="tab-panel" id="tab2">
+      <div class="sec" style="padding-top:12px;">
+        <div class="card">
+          <div class="card-hd"><span>⚡</span><h2>กฎพิเศษ</h2></div>
+          <div class="card-bd">
+
+            <div class="rule">
+              <div class="rule-ic">⚡</div>
+              <h3>รอบ 1 เสมอ → ตัดสิน 1 แต้ม!</h3>
+              <p>รอบแรกแข่ง <strong>2 เซ็ต</strong> ถ้าเสมอ 1–1 ไม่มีเซ็ตที่ 3!<br>
+              ตัดสินด้วย <strong>1 แต้มเดียวเท่านั้น</strong> — ใครทำแต้มได้ก่อน ชนะเลย 😆</p>
+            </div>
+
+            <div class="rule">
+              <div class="rule-ic">🎯</div>
+              <h3>Bonus ที่แต้ม 15 → ได้ +1 ทันที!</h3>
+              <p>ทีมไหนถึง <strong>15 แต้มก่อน</strong> → ได้โบนัส +1 กลายเป็น <strong>16</strong> เลย</p>
+              <div class="score-demo">
+                <div class="sd-box">
+                  <div class="sd-lbl">แต้มถึง 15</div>
+                  <div class="sd-num sd-from">15</div>
+                </div>
+                <div class="sd-arr">→</div>
+                <div class="sd-box">
+                  <div class="sd-lbl">โบนัส +1!</div>
+                  <div class="sd-num sd-to">16</div>
+                </div>
+                <div class="sd-star">⭐</div>
+              </div>
+              <p>ใช้ <strong>ทุกเซ็ต</strong> ตั้งแต่รอบแรกจนถึงรอบชิงชนะเลิศ!</p>
+            </div>
+
+            <div class="rule">
+              <div class="rule-ic">🔄</div>
+              <h3>รอบ 2 เป็นต้นไป — 1 เซ็ตเท่านั้น</h3>
+              <p>ทุกรอบหลังจากรอบ 1 แข่งเพียง <strong>1 เซ็ต</strong> จนถึงรอบชิงชนะเลิศ</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TAB 3: COURTS ══ -->
+    <div class="tab-panel" id="tab3">
+      <div class="sec" style="padding-top:12px;">
+        <div class="card">
+          <div class="card-hd"><span>🏸</span><h2>ตารางสนาม รอบที่ 1</h2></div>
+          <div class="card-bd">
+            <div class="court-note">⚠️ ทีมในสนามเดียวกัน <strong>ตกลงกันเองว่าคู่ไหนแข่งก่อน</strong><br>จากนั้น ชนะเจอชนะ · แพ้เจอแพ้ · <strong>สนามเดิม</strong></div>
+
+            <div class="cblock"><div class="chd">🏸 สนาม 1</div>
+              <div class="match"><span class="ta">🐛 หนอนน้อยเดียว</span><span class="vs-b">VS</span><span class="tb">อินทรีย์จอมผงาด 🦅</span></div>
+              <div class="match"><span class="ta">🐟 ปลาบู่ทองสองใจ</span><span class="vs-b">VS</span><span class="tb">ผีเสื้อมหาสมุทร 🦋</span></div>
+            </div>
+            <div class="cblock"><div class="chd">🏸 สนาม 2</div>
+              <div class="match"><span class="ta">🐃 ควายเผือกจังเลย</span><span class="vs-b">VS</span><span class="tb">เสือดำปี๋ 🐆</span></div>
+              <div class="match"><span class="ta">🦡 พังพอนไปเลย</span><span class="vs-b">VS</span><span class="tb">เหี้ยแห่งสยาม 🦎</span></div>
+            </div>
+            <div class="cblock"><div class="chd">🏸 สนาม 3</div>
+              <div class="match"><span class="ta">🐟 ปลาหมอคางดั๊มมมดำ</span><span class="vs-b">VS</span><span class="tb">แพนด้าแดงเฉยๆ 🐼</span></div>
+              <div class="match"><span class="ta">🦟 ยุงลายเป็นไข้เลือดออก</span><span class="vs-b">VS</span><span class="tb">ช้าง 10 ตัวเอาใบบัวมาทำไม 🐘</span></div>
+            </div>
+            <div class="cblock"><div class="chd">🏸 สนาม 4</div>
+              <div class="match"><span class="ta">🐡 ปลาปักเป้าเนื้อเหมือนไก่</span><span class="vs-b">VS</span><span class="tb">ละมั่งมีศรีสุข 🦌</span></div>
+              <div class="match"><span class="ta">🐠 ปลาคาร์ฟโผม</span><span class="vs-b">VS</span><span class="tb">สมเสร็จแล้ว 🦏</span></div>
+            </div>
+            <div class="cblock"><div class="chd">🏸 สนาม 5</div>
+              <div class="match"><span class="ta">🎰 สล็อตแมชชีน</span><span class="vs-b">VS</span><span class="tb">ค้างคาวปากแดง 🦇</span></div>
+              <div class="match"><span class="ta" style="font-size:0.62rem;">🐬 ปลาโลมา 1 ตัวกระโดดน้ำ 1 ที ปิ๊ด!</span><span class="vs-b">VS</span><span class="tb">ไก่จิกเด็กตาย 🐔</span></div>
+            </div>
+            <div class="cblock"><div class="chd">🏸 สนาม 6</div>
+              <div class="match"><span class="ta">🐿️ กระรอกบินไปไหน</span><span class="vs-b">VS</span><span class="tb">อึ่งไชโย 🐸</span></div>
+              <div class="match"><span class="ta">🐷 หมูอวกาศบูริน</span><span class="vs-b">VS</span><span class="tb">เต่าบินนะ 🐢</span></div>
+            </div>
+            <div class="cblock"><div class="chd">🏸 สนาม 7</div>
+              <div class="match"><span class="ta">🦍 กอริลลาพาต้าชื่อบัวน้อย</span><span class="vs-b">VS</span><span class="tb">นกเอี้ยงเลี้ยงควาย 🐦</span></div>
+              <div class="match"><span class="ta">🦦 ตุ่นตุยเย่</span><span class="vs-b">VS</span><span class="tb">แมงมุมขยุ้มหลังคาบ้าน 🕷️</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TAB 4: MEMBERS ══ -->
+    <div class="tab-panel" id="tab4">
+      <div class="sec" style="padding-top:12px;">
+        <div class="card">
+          <div class="card-hd"><span>👥</span><h2>รายชื่อสมาชิก</h2></div>
+          <div class="card-bd">
+
+            <button class="mtog" id="toggleMen">
+              <span>🙋‍♂️ ชายหล่อ (หรือป่าว) — 28 คน</span>
+              <span id="menArrow">▼</span>
+            </button>
+            <div class="members-section" id="menSection">
+              <div class="mgrid member-open">
+                <div class="mchip"><span class="mnum">1</span>ตี้</div>
+                <div class="mchip"><span class="mnum">2</span>ท้อป</div>
+                <div class="mchip"><span class="mnum">3</span>เบ้นซ์</div>
+                <div class="mchip"><span class="mnum">4</span>ตวง</div>
+                <div class="mchip"><span class="mnum">5</span>โจ้</div>
+                <div class="mchip"><span class="mnum">6</span>ก้อฟ</div>
+                <div class="mchip"><span class="mnum">7</span>แนค</div>
+                <div class="mchip"><span class="mnum">8</span>Pond</div>
+                <div class="mchip"><span class="mnum">9</span>บี</div>
+                <div class="mchip"><span class="mnum">10</span>อ้ม</div>
+                <div class="mchip"><span class="mnum">11</span>อ๊อฟ</div>
+                <div class="mchip"><span class="mnum">12</span>เต้ย</div>
+                <div class="mchip"><span class="mnum">13</span>A</div>
+                <div class="mchip"><span class="mnum">14</span>ออย</div>
+                <div class="mchip"><span class="mnum">15</span>อาร์ม</div>
+                <div class="mchip"><span class="mnum">16</span>บอย</div>
+                <div class="mchip"><span class="mnum">17</span>เหลียง</div>
+                <div class="mchip"><span class="mnum">18</span>Oak</div>
+                <div class="mchip"><span class="mnum">19</span>กอล์ฟ</div>
+                <div class="mchip"><span class="mnum">20</span>ต้น</div>
+                <div class="mchip"><span class="mnum">21</span>แฮม</div>
+                <div class="mchip"><span class="mnum">22</span>ตี๋</div>
+                <div class="mchip"><span class="mnum">23</span>อ๊อฟ (กู๋)</div>
+                <div class="mchip"><span class="mnum">24</span>รุจ</div>
+                <div class="mchip"><span class="mnum">25</span>ป้อง</div>
+                <div class="mchip"><span class="mnum">26</span>ปีปี้</div>
+                <div class="mchip"><span class="mnum">27</span>วี</div>
+                <div class="mchip"><span class="mnum">28</span>Disney</div>
+              </div>
+            </div>
+
+            <button class="mtog" id="toggleWomen">
+              <span>🙋‍♀️ หญิงสวย (มั้งนะ) — 19 + 9 คน</span>
+              <span id="womenArrow">▼</span>
+            </button>
+            <div class="members-section" id="womenSection">
+              <div class="member-open">
+                <div class="msub">หญิงแท้ 💁‍♀️</div>
+                <div class="mgrid">
+                  <div class="mchip"><span class="mnum">1</span>น้ำ</div>
+                  <div class="mchip"><span class="mnum">2</span>แก้ว</div>
+                  <div class="mchip"><span class="mnum">3</span>คุณย่ามากิ</div>
+                  <div class="mchip"><span class="mnum">4</span>สิริน</div>
+                  <div class="mchip"><span class="mnum">5</span>แนน</div>
+                  <div class="mchip"><span class="mnum">6</span>หมู</div>
+                  <div class="mchip"><span class="mnum">7</span>จุ๋ม (กู๋)</div>
+                  <div class="mchip"><span class="mnum">8</span>อุ๋ย</div>
+                  <div class="mchip"><span class="mnum">9</span>Pare</div>
+                  <div class="mchip"><span class="mnum">10</span>Orn</div>
+                  <div class="mchip"><span class="mnum">11</span>แตง</div>
+                  <div class="mchip"><span class="mnum">12</span>แอนนี่</div>
+                  <div class="mchip"><span class="mnum">13</span>เจเจ</div>
+                  <div class="mchip"><span class="mnum">14</span>เชอร์</div>
+                  <div class="mchip"><span class="mnum">15</span>ด้อม</div>
+                  <div class="mchip"><span class="mnum">16</span>กิ๊ฟ</div>
+                  <div class="mchip"><span class="mnum">17</span>มะเฟือง</div>
+                  <div class="mchip"><span class="mnum">18</span>อีฟ (กู๋)</div>
+                  <div class="mchip"><span class="mnum">19</span>กู๋</div>
+                </div>
+                <div class="msub">🤖 ชายที่ AI เลือกให้มาเสริมทีม</div>
+                <div class="mgrid">
+                  <div class="mchip"><span class="mnum">20</span>คุณปู่มากิ</div>
+                  <div class="mchip"><span class="mnum">21</span>เด่น</div>
+                  <div class="mchip"><span class="mnum">22</span>นิค</div>
+                  <div class="mchip"><span class="mnum">23</span>พีท</div>
+                  <div class="mchip"><span class="mnum">24</span>ฟิกซ์</div>
+                  <div class="mchip"><span class="mnum">25</span>เต๋า</div>
+                  <div class="mchip"><span class="mnum">26</span>ฮอลล์</div>
+                  <div class="mchip"><span class="mnum">27</span>สน</div>
+                  <div class="mchip"><span class="mnum">28</span>ไปป์</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="footer">
+          <div style="font-size:2rem;margin-bottom:8px;">🍀</div>
+          <div style="color:#c9a85c;font-size:0.96rem;font-weight:700;margin-bottom:4px;">โชคดีทุกท่านค่ะ 🫰</div>
+          <div style="color:#a0b4c8;font-size:0.78rem;margin-bottom:6px;">จัดโดย รส / เปิ้ล 😍</div>
+          <div style="color:#c9a85c;font-size:0.8rem;font-style:italic;">"Time is Running. Let's grow together." 🏸</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="nav">
+    <button class="nav-btn active" id="nav0" onclick="goTab(0)">
+      <span class="nav-ic">🏠</span>
+      <span class="nav-lbl">หน้าหลัก</span>
+    </button>
+    <button class="nav-btn" id="nav1" onclick="goTab(1)">
+      <span class="nav-ic">🏆</span>
+      <span class="nav-lbl">รูปแบบ</span>
+    </button>
+    <button class="nav-btn" id="nav2" onclick="goTab(2)">
+      <span class="nav-ic">⚡</span>
+      <span class="nav-lbl">กฎพิเศษ</span>
+    </button>
+    <button class="nav-btn" id="nav3" onclick="goTab(3)">
+      <span class="nav-ic">🏸</span>
+      <span class="nav-lbl">สนาม</span>
+    </button>
+    <button class="nav-btn" id="nav4" onclick="goTab(4)">
+      <span class="nav-ic">👥</span>
+      <span class="nav-lbl">สมาชิก</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+  // ── TAB NAVIGATION ──
+  var currentTab = 0;
+  function goTab(n) {
+    document.getElementById('tab' + currentTab).classList.remove('active');
+    document.getElementById('nav' + currentTab).classList.remove('active');
+    currentTab = n;
+    document.getElementById('tab' + n).classList.add('active');
+    document.getElementById('nav' + n).classList.add('active');
+    window.scrollTo(0, 0);
+    if (n === 0) setTimeout(setupReveal, 150);
+  }
+
+  // ── PARTICLES ──
+  (function() {
+    var pts = document.getElementById('pts');
+    var emojis = ['🏸','🏸','🏸','⭐','✨'];
+    for (var i = 0; i < 14; i++) {
+      var el = document.createElement('div');
+      el.textContent = emojis[i % 5];
+      el.style.cssText = [
+        'position:absolute',
+        'left:' + (Math.random() * 100) + '%',
+        'font-size:' + (0.5 + Math.random() * 0.65) + 'rem',
+        'animation:drift ' + (13 + Math.random() * 18) + 's linear ' + (-Math.random() * 28) + 's infinite'
+      ].join(';');
+      pts.appendChild(el);
+    }
+  })();
+
+  // ── COUNTDOWN ──
+  function tick() {
+    var target = new Date('2026-06-24T09:00:00+07:00').getTime();
+    var diff = target - Date.now();
+    if (diff <= 0) {
+      ['cd_d','cd_h','cd_m','cd_s'].forEach(function(id) {
+        document.getElementById(id).textContent = '00';
+      });
+      return;
+    }
+    document.getElementById('cd_d').textContent = String(Math.floor(diff / 86400000)).padStart(2, '0');
+    document.getElementById('cd_h').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
+    document.getElementById('cd_m').textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+    document.getElementById('cd_s').textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  // ── SCROLL REVEAL ──
+  var revealObs;
+  function setupReveal() {
+    if (revealObs) revealObs.disconnect();
+    revealObs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) e.target.classList.add('in-view');
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -48px 0px' });
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      revealObs.observe(el);
+    });
+  }
+  setTimeout(setupReveal, 120);
+
+  // ── MEMBER TOGGLES ──
+  document.getElementById('toggleMen').addEventListener('click', function() {
+    var sec = document.getElementById('menSection');
+    var arrow = document.getElementById('menArrow');
+    var open = sec.classList.toggle('open');
+    arrow.textContent = open ? '▲' : '▼';
+  });
+  document.getElementById('toggleWomen').addEventListener('click', function() {
+    var sec = document.getElementById('womenSection');
+    var arrow = document.getElementById('womenArrow');
+    var open = sec.classList.toggle('open');
+    arrow.textContent = open ? '▲' : '▼';
+  });
+</script>
+</body>
+</html>
