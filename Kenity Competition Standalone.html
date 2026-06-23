@@ -736,6 +736,7 @@ function renderAdminContent() {
     else if (adminPhase==='r1') h += renderAdminMatches(R1,'r1');
     else if (adminPhase==='r2') h += renderAdminR2();
     else if (adminPhase==='r3') h += renderAdminR3();
+    h += `<div class="admin-sep"></div><button class="abtn-sm" style="width:100%;color:#f87171;border-color:rgba(248,113,113,.3)" onclick="resetAll()">🗑️ ล้างข้อมูลทั้งหมด</button>`;
   }
   el.innerHTML = h;
 }
@@ -848,6 +849,16 @@ async function adminConnect() {
   else { msg.innerHTML = '<span class="admin-err">เชื่อมต่อไม่สำเร็จ — ตรวจสอบ Supabase</span>'; }
 }
 function setPhase(p) { adminPhase=p; renderAdminContent(); }
+async function resetAll() {
+  if (!confirm('ล้างข้อมูลทั้งหมด? (ผลการแข่งขัน + การจับคู่ + รอบพิเศษ)')) return;
+  await Promise.all([
+    sb.from('match_results').delete().not('id','is',null),
+    sb.from('custom_matches').delete().not('id','is',null),
+    sb.from('assignments').delete().not('id','is',null)
+  ]);
+  asgn={}; res={}; customM=[];
+  renderLive(); renderAdminContent();
+}
 async function doAssign(teamId, p1, p2) {
   try { await saveAssignment(teamId,p1,p2); } catch(e) { console.error(e); }
 }
