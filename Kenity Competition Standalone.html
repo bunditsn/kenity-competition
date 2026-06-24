@@ -833,7 +833,7 @@ function renderCustomBracket() {
     const color=track==='upper'?'🔼 สายบน':'🔽 สายล่าง';
     const cls=track==='upper'?'upper':'lower';
     html+=`<div class="bk-track-block"><div class="bk-track-hdr ${cls}">${color}</div>`;
-    html+=`<div style="margin:6px 10px 0;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.28);border-radius:8px;padding:5px 10px;font-size:.6rem;color:#fbbf24;line-height:1.6">🎲 <b>จับฉลากคืนชีพ</b> — ก่อนเริ่ม รอบ 3 จะจับฉลากเพื่อกำหนดทีมที่ได้ผ่านรอบ (bye) เข้าสู่ รอบ 4 โดยตรง</div>`;
+    html+=`<div style="margin:6px 10px 0;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.28);border-radius:8px;padding:5px 10px;font-size:.6rem;color:#fbbf24;line-height:1.6">🎲 <b>จับฉลากคืนชีพ</b> — หลัง รอบ 2 แต่ละสายมี 7 ทีม จับฉลากเพิ่ม 1 ทีมที่ตกรอบให้คืนชีพ ครบ 8 ทีม ก่อนเข้า รอบ 3</div>`;
     html+=`<div style="display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 10px 14px;gap:0;align-items:flex-start">`;
 
     tr.forEach((rnd,ri)=>{
