@@ -806,39 +806,71 @@ function renderBracket() {
 
 function renderCustomBracket() {
   if (!customM.length) return '';
+  const SH=24, SG=3, MH=SH*2+SG, MS=MH+10, CW=118, NW=20, LH=20;
+  const LC='rgba(201,168,92,.45)';
   const slot2 = (id, won) => {
-    if (!id) return `<div class="bk-slot bk-nd">TBD</div>`;
-    return `<div class="bk-slot${won===true?' bk-w':won===false?' bk-l':''}">${tn(id)}</div>`;
+    if (!id) return `<div class="bk-slot bk-nd" style="height:${SH}px;min-height:${SH}px">TBD</div>`;
+    return `<div class="bk-slot${won===true?' bk-w':won===false?' bk-l':''}" style="height:${SH}px;min-height:${SH}px">${tn(id)}</div>`;
   };
   const rounds = [...new Set(customM.map(m=>m.round))].sort((a,b)=>a-b);
-
   let html = `<div class="live-sec-title sec-closed" onclick="toggleSec(this)">แผนผังรอบ 3 ขึ้นไป <span class="sec-chev">▾</span></div><div class="live-sec-body sec-hidden">`;
 
   ['upper','lower'].forEach(track => {
-    const trackMatches = customM.filter(m=>m.track===track);
-    if (!trackMatches.length) return;
-    const color = track==='upper' ? '🔼 สายบน' : '🔽 สายล่าง';
-    const cls = track==='upper' ? 'upper' : 'lower';
-    html += `<div class="bk-track-block"><div class="bk-track-hdr ${cls}">${color}</div><div class="bk-rounds-row">`;
+    const tm = customM.filter(m=>m.track===track);
+    if (!tm.length) return;
+    const tr = rounds.filter(r=>tm.some(m=>m.round===r));
+    const n0 = tm.filter(m=>m.round===tr[0]).length;
+    const totalH = n0*MS, contH = totalH+LH;
 
-    rounds.forEach((rnd, ri) => {
-      const rMatches = trackMatches.filter(m=>m.round===rnd);
-      if (!rMatches.length) return;
-      if (ri > 0) html += `<div class="bk-connector"></div>`;
-      html += `<div class="bk-round-col"><div class="bk-round-lbl">รอบ ${rnd}</div>`;
-      rMatches.forEach(m => {
-        const w = m.winner_id;
-        html += `<div class="bk-match-node">
-          ${slot2(m.team1_id, w ? w===m.team1_id : undefined)}
-          ${slot2(m.team2_id, w ? w===m.team2_id : undefined)}
+    // compute bracket y-centers per round
+    const cens = [Array.from({length:n0},(_,i)=>i*MS+MH/2)];
+    for (let ri=1;ri<tr.length;ri++) {
+      const p=cens[ri-1], nx=[];
+      for (let i=0;i<p.length;i+=2) nx.push(i+1<p.length?(p[i]+p[i+1])/2:p[i]);
+      cens.push(nx);
+    }
+
+    const color=track==='upper'?'🔼 สายบน':'🔽 สายล่าง';
+    const cls=track==='upper'?'upper':'lower';
+    html+=`<div class="bk-track-block"><div class="bk-track-hdr ${cls}">${color}</div>`;
+    html+=`<div style="display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 10px 14px;gap:0;align-items:flex-start">`;
+
+    tr.forEach((rnd,ri)=>{
+      const rm=tm.filter(m=>m.round===rnd);
+      const cs=cens[ri];
+      html+=`<div style="position:relative;width:${CW}px;height:${contH}px;flex-shrink:0">`;
+      html+=`<div style="font-size:.44rem;color:#a0b4c8;text-transform:uppercase;letter-spacing:.08em;text-align:center;line-height:${LH}px">รอบ ${rnd}</div>`;
+      rm.forEach((m,mi)=>{
+        const top=LH+cs[mi]-MH/2, w=m.winner_id;
+        html+=`<div style="position:absolute;top:${top}px;left:0;right:0;display:flex;flex-direction:column;gap:${SG}px">
+          ${slot2(m.team1_id,w?w===m.team1_id:undefined)}
+          ${slot2(m.team2_id,w?w===m.team2_id:undefined)}
         </div>`;
       });
-      html += `</div>`;
-    });
+      html+=`</div>`;
 
-    html += `</div></div>`;
+      if (ri<tr.length-1) {
+        const p=cens[ri], nx=cens[ri+1];
+        let paths=''; let ni=0;
+        for (let i=0;i<p.length;i+=2){
+          if (i+1<p.length){
+            const y1=LH+p[i],y2=LH+p[i+1],ym=(y1+y2)/2,mx=NW/2;
+            paths+=`<line x1="0" y1="${y1}" x2="${mx}" y2="${y1}" stroke="${LC}" stroke-width="1"/>`;
+            paths+=`<line x1="0" y1="${y2}" x2="${mx}" y2="${y2}" stroke="${LC}" stroke-width="1"/>`;
+            paths+=`<line x1="${mx}" y1="${y1}" x2="${mx}" y2="${y2}" stroke="${LC}" stroke-width="1"/>`;
+            paths+=`<line x1="${mx}" y1="${ym}" x2="${NW}" y2="${ym}" stroke="${LC}" stroke-width="1"/>`;
+          } else {
+            const y=LH+p[i];
+            paths+=`<line x1="0" y1="${y}" x2="${NW}" y2="${y}" stroke="${LC}" stroke-width="1" stroke-dasharray="3,2"/>`;
+          }
+          ni++;
+        }
+        html+=`<svg width="${NW}" height="${contH}" style="flex-shrink:0;overflow:visible">${paths}</svg>`;
+      }
+    });
+    html+=`</div></div>`;
   });
-  html += `</div>`;
+  html+=`</div>`;
   return html;
 }
 
